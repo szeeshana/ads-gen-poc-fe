@@ -12,13 +12,14 @@ function Dashboard() {
         { title: 'Ads By Image', description: '560 Ads Generated', link: '/job-by-image' },
         { title: 'Ads By Demographic', description: '560 Ads Generated' , link: '/job-by-demographic'},
         { title: 'Ads By Description', description: '560 Ads Generated' , link: '/job-by-description'},
+        { title: 'Ads By Evaluation', description: '560 Ads Generated' , link: '/job-by-description'},
     ])
     return (
         <>
             <DashboardHeader />
             <Row style={{ marginTop: '-130px' }} className='mx-16'>
                 <Col span={24}>
-                    <Title style={{ color: 'white' }}>Hello User</Title>
+                    <Title style={{ color: 'white' }}>Welcome!</Title>
                     <Paragraph style={{ color: 'white' }}>We are on a mission to create attractive ads using AI</Paragraph>
                 </Col>
             </Row>
@@ -27,7 +28,7 @@ function Dashboard() {
                     <Row gutter={8} className='h-48'>
                         {
                             statsData.map((item) => (
-                                <Col key={item.title} xs={{ span: 24 }} sm={{ span: 12 }} lg={{ span: 8 }} className='pb-8'>
+                                <Col key={item.title} xs={{ span: 24 }} sm={{ span: 12 }} lg={{ span: 12 }} className='pb-8'>
                                     <Link to={item.link}>
                                     <JobCard description={item.description} title={item.title} />
                                 </Link>

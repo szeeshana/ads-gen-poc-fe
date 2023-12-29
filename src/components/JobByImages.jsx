@@ -8,7 +8,6 @@ import { Form, Formik } from 'formik';
 import { enqueueSnackbar } from 'notistack';
 import { postApi } from '../utils/httpServices';
 import { useNavigate } from 'react-router-dom';
-import { CommonTextAreaInput } from './common/CommonTextArea';
 import CommonSelect from './common/CommonSelect';
 const getBase64 = (file) =>
     new Promise((resolve, reject) => {
@@ -53,24 +52,23 @@ function JobByImages() {
             <DashboardHeader />
             <Row style={{ marginTop: '-130px' }} className='mx-16'>
                 <Col span={24}>
-                    <Title level={3} style={{ color: 'white' }}>Upload and describe multiple images</Title>
-                    <Paragraph style={{ color: 'white' }}>Upload multiple images to create attractive ads using AI</Paragraph>
+                    <Title level={3} style={{ color: 'white' }}>Job By Image Upload</Title>
+                    <Paragraph style={{ color: 'white' }}>Upload image to create attractive ads using AI</Paragraph>
                 </Col>
             </Row>
             <Formik
                 initialValues={{
-                    files: '',
-                    description: '',
+                    file: '',
                     status:''
                 }}
                 onSubmit={async (values, { setSubmitting }) => {
                     setLoading(true);
                     let imageFiles = fileList.map((file) => file.originFileObj)
-                    values.files = imageFiles
+                    values.file = imageFiles
                     try {
                         // eslint-disable-next-line
                         const response = await postApi({
-                            url: `${process.env.REACT_APP_BASE_URI}/api/job/create-description-image-evaluate`,
+                            url: `${process.env.REACT_APP_BASE_URI}/api/job/create-by-image`,
                             method: "POST",
                             body: values,
                             options: {
@@ -93,34 +91,7 @@ function JobByImages() {
                 {({ setFieldValue }) => (
                     <Form>
                         <Row className='mx-8' style={{ marginTop: '60px' }}>
-                            <Col span={24}>
-                                <CommonTextAreaInput
-                                    label="Image Description"
-                                    name="description"
-                                    id="description"
-                                    className='w-full mb-8'
-                                    placeholder='Describe the image'
-                                    type='text'
-                                    size='large'
-                                    style={{ minHeight: '100px' }}
-                                />
-                            </Col>
-                            <Col span={24} className='w-full mb-8'>
-                                <b className='text-grey'>Upload Image</b>
-                                <Upload
-                                    name="Images"
-                                    className='pt-8 px-8 border-primary uploadButton-bg'
-                                    beforeUpload={() => false}
-                                    listType="picture-card"
-                                    fileList={fileList}
-                                    onPreview={handlePreview}
-                                    onChange={handleChange}
-                                    multiple
-                                >
-                                    {uploadButton}
-                                </Upload>
-                            </Col>
-                            <Col span={24}>
+                        <Col span={24}>
                                 <CommonSelect
                                     label="What you want to do with this job?"
                                     name="status"
@@ -136,6 +107,21 @@ function JobByImages() {
                                     onChange={(e) => setFieldValue('status', e)}
                                 />
                             </Col>
+                            <Col span={24} className='w-full mb-8 mt-16'>
+                                <b className='text-grey'>Upload Image</b>
+                                <Upload
+                                    name="Images"
+                                    className='pt-8 px-8 border-primary uploadButton-bg'
+                                    beforeUpload={() => false}
+                                    listType="picture-card"
+                                    fileList={fileList}
+                                    onPreview={handlePreview}
+                                    onChange={handleChange}
+                                >
+                                    {fileList.length <1 ? uploadButton : null}
+                                </Upload>
+                            </Col>
+                            
                             <Divider>
                                 <Button type='primary' disabled={loading} htmlType='submit' className='px-32'>{loading ? <Spin /> : 'Submit'}</Button>
                             </Divider>

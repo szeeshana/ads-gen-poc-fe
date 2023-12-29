@@ -134,6 +134,7 @@ a {
 .align-content-center{align-content: center;}
 .align-content-start{align-content: start;}
 .align-content-end{align-content: end;}
+.flex-wrap{flex-wrap: wrap;}
 /* -------------------------------------------------- */
 .p-0{padding: 0px;}
 .px-0	{padding-left: 0px; padding-right: 0px;}

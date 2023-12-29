@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ic_dashboard from '../assets/images/admin/icons/ic_dashboard.svg'
 import ic_job from '../assets/images/admin/icons/ic_job.svg'
 import ic_user from '../assets/images/admin/icons/ic_user.svg'
+import ic_exit from '../assets/images/admin/icons/ic_exit_full_screen.svg'
 import { Layout, Menu, theme } from 'antd';
 import { useSelector } from 'react-redux';
 import { setThemeColor } from '../store/theme/slice';
@@ -20,8 +21,8 @@ function getItem(label, key, icon, children) {
 }
 const MainLayout = () => {
   const [current, setCurrent] = useState('1');
-    const keyUrl= window.location.pathname
-    useEffect(()=>{
+  const keyUrl = window.location.pathname
+  useEffect(() => {
     window.scrollTo(0, 0);
     if (keyUrl === '/') {
       setCurrent('1')
@@ -31,12 +32,12 @@ const MainLayout = () => {
       setCurrent('3')
     } else if (keyUrl === '/job-by-description') {
       setCurrent('4')
-    }else if(keyUrl === '/jobs'){
+    } else if (keyUrl === '/jobs') {
       setCurrent('5')
     }
   }, [keyUrl])
-  
-  const [collapsed, setCollapsed] = useState(false);
+
+  const [collapsed, setCollapsed] = useState(true);
   const { themeMode } = useSelector(state => state.themeSetup)
   const items = [
     getItem(
@@ -44,25 +45,37 @@ const MainLayout = () => {
       '1',
       <span style={{ WebkitMask: `url(${ic_dashboard}) no-repeat center/cover`, width: '30px', height: '30px', backgroundColor: 'currentcolor', color: setThemeColor }}></span>,
     ),
-    getItem(
-      <Link to={'/job-by-image'} >Job-Images</Link>,
-      '2',
-      <span style={{ WebkitMask: `url(${ic_user}) no-repeat center/cover`, width: '30px', height: '30px', backgroundColor: 'currentcolor', color: setThemeColor }}></span>,
-    ),
-    getItem(
-      <Link to={'/job-by-demographic'} >Job-Demographic</Link>,
-      '3',
-      <span style={{ WebkitMask: `url(${ic_user}) no-repeat center/cover`, width: '30px', height: '30px', backgroundColor: 'currentcolor', color: setThemeColor }}></span>,
-    ),
-    getItem(
-      <Link to={'/job-by-description'} >Job-Description</Link>,
-      '4',
-      <span style={{ WebkitMask: `url(${ic_job}) no-repeat center/cover`, width: '30px', height: '30px', backgroundColor: 'currentcolor', color: setThemeColor }}></span>,
-    ),
+    getItem('Jobs', 'sub', <span style={{ WebkitMask: `url(${ic_job}) no-repeat center/cover`, width: '30px', marginLeft:`${collapsed? '0px': '-5px'}`, height: '30px', backgroundColor: 'currentcolor', color: setThemeColor }}></span>, [
+      getItem(
+        <Link to={'/job-by-image'} >Job By Image</Link>,
+        '2',
+        ''
+      ),
+      getItem(
+        <Link to={'/job-by-demographic'} >Job By Demographic</Link>,
+        '3',
+        ''
+      ),
+      getItem(
+        <Link to={'/job-by-description'} >Job Bu Description</Link>,
+        '4',
+        ''
+      ),
+    ]),
     getItem(
       <Link to={'/jobs'} >View Jobs</Link>,
       '5',
       <span style={{ WebkitMask: `url(${ic_job}) no-repeat center/cover`, width: '30px', height: '30px', backgroundColor: 'currentcolor', color: setThemeColor }}></span>,
+    ),
+    getItem(
+      <Link to={''} >Profile</Link>,
+      '6',
+      <span style={{ WebkitMask: `url(${ic_user}) no-repeat center/cover`, width: '30px', height: '30px', backgroundColor: 'currentcolor', color: setThemeColor }}></span>,
+    ),
+    getItem(
+      <Link >Logout</Link>,
+      '7',
+      <span style={{ WebkitMask: `url(${ic_exit}) no-repeat center/cover`, width: '30px', height: '30px', backgroundColor: 'currentcolor', color: setThemeColor }}></span>,
     ),
   ];
   const {
@@ -85,7 +98,7 @@ const MainLayout = () => {
           {/* <Image  src= {logo} height={100} preview={false} alt='logo' /> */}
           <Title level={3}>AdsGen</Title>
         </div>
-        <Menu theme={themeMode} onClick={({ key }) => setCurrent(key)}  selectedKeys={current} mode="inline" items={items} />
+        <Menu theme={themeMode} onClick={({ key }) => setCurrent(key)} selectedKeys={current} mode="inline" items={items} />
       </Sider>
       <Layout>
         <Header

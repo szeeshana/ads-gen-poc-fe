@@ -7,6 +7,7 @@ import JobByDesc from './components/JobByDesc'
 import ProtectedRoute from './auth/ProtectedRoute'
 import ViewJobs from './components/ViewJobs'
 import WebSocketComponent from './components/WebSocket'
+import JobDetail from './components/JobDetail'
 
 function AppRouting() {
     return (
@@ -47,6 +48,14 @@ function AppRouting() {
                 <Route path='/jobs' element={
                     <ProtectedRoute>
                         <ViewJobs />
+                    </ProtectedRoute>
+                }
+                />
+            </Routes>
+            <Routes>
+                <Route path='/job-detail' element={
+                    <ProtectedRoute>
+                        <JobDetail />
                     </ProtectedRoute>
                 }
                 />

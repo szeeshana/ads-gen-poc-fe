@@ -7,11 +7,12 @@ import { getApi } from '../utils/httpServices'
 import DashboardHeader from './admin/DashboardHeader'
 import { enqueueSnackbar } from 'notistack'
 import ReactJson from 'react-json-view'
+import { useNavigate } from 'react-router-dom'
 
 
 function ViewJobs() {
     const [viewDescription, setViewDescription] = useState(false)
-    const [viewResult, setViewResult] = useState(false)
+    const navigate = useNavigate()
     const [jobsData, setJobsData] = useState([])
     useEffect(() => {
         const getJobsData = async () => {
@@ -90,14 +91,14 @@ function ViewJobs() {
             render: (text, record) => {
                 return (
                     <>
-                        <Button onClick={() => setViewResult(true)} style={{padding:'0px 15px', textAlign:'center'}} >View</Button>
-                        <Modal open={viewResult} title={'Your Result'} footer={null} onCancel={() => setViewResult(false)}>
+                        <Button onClick={() => navigate('/job-detail', {state:{id:record._id}})} style={{padding:'0px 15px', textAlign:'center'}} >View</Button>
+                        {/* <Modal open={viewResult} title={'Your Result'} footer={null} onCancel={() => setViewResult(false)}>
                             <Row>
-                            <Col span={24} style={{ minHeight:'200px'}}>
+                                <Col span={24} style={{ minHeight:'200px'}}>
                                         <ReactJson src={text} collapsed={1} collapseStringsAfterLength={30} theme={'monokai'} indentWidth={3} iconStyle='square' style={{ wordBreak:'break-all'}} />
                                 </Col>
                             </Row>
-                        </Modal>
+                        </Modal> */}
                     </>
                 )
             }
