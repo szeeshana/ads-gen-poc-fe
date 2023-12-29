@@ -58,13 +58,13 @@ function JobByImages() {
             </Row>
             <Formik
                 initialValues={{
-                    file: '',
+                    image: '',
                     status:''
                 }}
                 onSubmit={async (values, { setSubmitting }) => {
                     setLoading(true);
                     let imageFiles = fileList.map((file) => file.originFileObj)
-                    values.file = imageFiles
+                    values.image = imageFiles[0]
                     try {
                         // eslint-disable-next-line
                         const response = await postApi({

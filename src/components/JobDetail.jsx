@@ -117,6 +117,7 @@ function JobDetail() {
                                 <Select 
                                     placeholder="Change Status"
                                     value={record.status}
+                                    disabled={record.status === 'completed'}
                                     className='w-full'
                                     options={[
                                         { value: 'draft', label: 'Draft' },
@@ -194,6 +195,7 @@ function JobDetail() {
                             stageData?.map((img) => (
                                 <Row key={img.image} >
                                     <Image src={img.image} alt={img.image} width={200} height={200} className='border-primary' />
+                                    <p>{img.rating}</p>
                                 </Row>
                             ))
                         }
