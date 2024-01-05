@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import { setThemeColor } from '../store/theme/slice';
 import AppRouting from '../AppRouting';
 import TopHeader from './TopHeader';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Title from 'antd/es/typography/Title';
 const { Header, Content, Sider } = Layout;
 function getItem(label, key, icon, children) {
@@ -20,6 +20,7 @@ function getItem(label, key, icon, children) {
   };
 }
 const MainLayout = () => {
+  const navigate = useNavigate();
   const [current, setCurrent] = useState('1');
   const keyUrl = window.location.pathname
   useEffect(() => {
@@ -73,7 +74,7 @@ const MainLayout = () => {
       <span style={{ WebkitMask: `url(${ic_user}) no-repeat center/cover`, width: '30px', height: '30px', backgroundColor: 'currentcolor', color: setThemeColor }}></span>,
     ),
     getItem(
-      <Link >Logout</Link>,
+      <Link onClick={() => { localStorage.clear(); navigate('/') }}>Logout</Link>,
       '7',
       <span style={{ WebkitMask: `url(${ic_exit}) no-repeat center/cover`, width: '30px', height: '30px', backgroundColor: 'currentcolor', color: setThemeColor }}></span>,
     ),

@@ -9,10 +9,10 @@ import { Link } from 'react-router-dom'
 
 function Dashboard() {
     const [statsData] = useState([
-        { title: 'Ads By Image', description: '560 Ads Generated', link: '/job-by-image' },
-        { title: 'Ads By Demographic', description: '560 Ads Generated' , link: '/job-by-demographic'},
-        { title: 'Ads By Description', description: '560 Ads Generated' , link: '/job-by-description'},
-        { title: 'Ads By Evaluation', description: '560 Ads Generated' , link: '/job-by-description'},
+        { title: 'Ads By Image', description: '560 Ads Generated', link: '/job-by-image' , enable : true },
+        { title: 'Ads By Demographic', description: '560 Ads Generated' , link: '/job-by-demographic' ,enable : false},
+        { title: 'Ads By Description', description: '560 Ads Generated' , link: '/job-by-description' ,enable : false},
+        { title: 'Ads By Evaluation', description: '560 Ads Generated' , link: '/job-by-description' ,enable : false},
     ])
     return (
         <>
@@ -29,9 +29,13 @@ function Dashboard() {
                         {
                             statsData.map((item) => (
                                 <Col key={item.title} xs={{ span: 24 }} sm={{ span: 12 }} lg={{ span: 12 }} className='pb-8'>
-                                    <Link to={item.link}>
-                                    <JobCard description={item.description} title={item.title} />
-                                </Link>
+                                    {
+                                        item.enable ?  <Link to={item.link}>
+                                        <JobCard description={item.description} title={item.title} />
+                                        </Link> : <JobCard description={item.description} title={item.title} />
+
+                                    }
+                                    
                                 </Col>
                             ))
                         }

@@ -18,18 +18,42 @@ export function getBlobApi(params) {
   });
 }
 
-export function getApi(params) {
-  return axios.get(params.url, getAuthToken());
+export async function getApi(params) {
+  try {
+    return axios.get(params.url, getAuthToken());
+  } catch (error) {
+    if(error?.response?.status && error?.response?.status === 401) {
+      localStorage.removeItem('token')
+    }
+  }
 }
 
 export function postApi(params) {
-  return axios.post(params.url, params.body, getAuthToken(params.options));
+  try {
+    return axios.post(params.url, params.body, getAuthToken(params.options));
+  } catch (error) {
+    if(error?.response?.status && error?.response?.status === 401) {
+      localStorage.removeItem('token')
+    }
+  }
 }
 
 export function patchApi(params) {
-  return axios.patch(params.url, params.body, getAuthToken(params.options));
+  try {
+    return axios.patch(params.url, params.body, getAuthToken(params.options));
+  } catch (error) {
+    if(error?.response?.status && error?.response?.status === 401) {
+      localStorage.removeItem('token')
+    }
+  }
 }
 
 export function deleteApi(params) {
-  return axios.delete(params.url, getAuthToken());
+  try {
+    return axios.delete(params.url, getAuthToken());
+  } catch (error) {
+    if(error?.response?.status && error?.response?.status === 401) {
+      localStorage.removeItem('token')
+    }
+  }
 }

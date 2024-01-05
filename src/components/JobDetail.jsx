@@ -166,7 +166,7 @@ function JobDetail() {
                             [{
                                 key: '1',
                                 label: <Paragraph> Click to read stage one description</Paragraph>,
-                                children: <p>{'sdsds'}</p>,
+                                children: jobData && jobData.length && jobData[0]['descriptions'] && jobData[0]['descriptions'].length && jobData[0]['descriptions'].map((item) => <><li><strong>Rating :</strong> {item.rating}</li><li><strong>Description : </strong> <br></br> {item.description}</li> <br></br></>),
                             }]
                         } />
                     </Col>
@@ -175,7 +175,7 @@ function JobDetail() {
                             [{
                                 key: '1',
                                 label: <Paragraph level={5}>Click to read stage one description</Paragraph>,
-                                children: <p>{'sdsds'}</p>,
+                                children: jobData && jobData.length && jobData[0]['second_stage_descriptions'] && jobData[0]['second_stage_descriptions'].length && jobData[0]['second_stage_descriptions'].map((item) => <><li><strong>Rating :</strong> {item.rating}</li><li><strong>Description : </strong> <br></br> {item.description}</li> <br></br></>),
                             }]
                         } />
                     </Col>
@@ -193,9 +193,10 @@ function JobDetail() {
 
                         {
                             stageData?.map((img) => (
-                                <Row key={img.image} >
-                                    <Image src={img.image} alt={img.image} width={200} height={200} className='border-primary' />
-                                    <p>{img.rating}</p>
+                                <Row style={{marginLeft: '10px'}} key={img.image}>
+                                    <Badge count={img.rating}>
+                                        <Image src={img.image} alt={img.image} width={200} height={200} className='border-primary' />
+                                    </Badge>
                                 </Row>
                             ))
                         }
