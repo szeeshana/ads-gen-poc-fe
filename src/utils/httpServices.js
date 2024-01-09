@@ -20,7 +20,8 @@ export function getBlobApi(params) {
 
 export async function getApi(params) {
   try {
-    return axios.get(params.url, getAuthToken());
+    const response = await axios.get(params.url, getAuthToken());
+    return response;
   } catch (error) {
     if(error?.response?.status && error?.response?.status === 401) {
       localStorage.removeItem('token')
@@ -28,9 +29,10 @@ export async function getApi(params) {
   }
 }
 
-export function postApi(params) {
+export async function postApi(params) {
   try {
-    return axios.post(params.url, params.body, getAuthToken(params.options));
+    const response = await axios.post(params.url, params.body, getAuthToken(params.options));
+    return response;
   } catch (error) {
     if(error?.response?.status && error?.response?.status === 401) {
       localStorage.removeItem('token')
@@ -38,9 +40,10 @@ export function postApi(params) {
   }
 }
 
-export function patchApi(params) {
+export async function patchApi(params) {
   try {
-    return axios.patch(params.url, params.body, getAuthToken(params.options));
+    const response = await axios.patch(params.url, params.body, getAuthToken(params.options));
+    return response;
   } catch (error) {
     if(error?.response?.status && error?.response?.status === 401) {
       localStorage.removeItem('token')
@@ -48,9 +51,10 @@ export function patchApi(params) {
   }
 }
 
-export function deleteApi(params) {
+export async function deleteApi(params) {
   try {
-    return axios.delete(params.url, getAuthToken());
+    const response = await axios.delete(params.url, getAuthToken());
+    return response;
   } catch (error) {
     if(error?.response?.status && error?.response?.status === 401) {
       localStorage.removeItem('token')

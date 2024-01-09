@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Badge, Button, Card, Col, Modal, Row, Table, Tooltip } from 'antd'
-import { EyeOutlined, StopOutlined, CopyOutlined } from '@ant-design/icons'
+import { Badge, Button, Card, Col, Modal, Row, Spin, Table, Tooltip } from 'antd'
+import { EyeOutlined, StopOutlined, CopyOutlined, RedoOutlined } from '@ant-design/icons'
 import Title from 'antd/es/typography/Title'
 import Paragraph from 'antd/es/typography/Paragraph'
 import { getApi } from '../utils/httpServices'
@@ -14,17 +14,20 @@ function ViewJobs() {
     const [viewDescription, setViewDescription] = useState(false)
     const navigate = useNavigate()
     const [jobsData, setJobsData] = useState([])
-    useEffect(() => {
-        const getJobsData = async () => {
-            try {
-                const res = await getApi({ url: `${process.env.REACT_APP_BASE_URI}/api/job` });
-                if (res.status === 200) {
-                    setJobsData(res.data.data);
-                }
-            } catch (error) {
-                console.log(error);
+    const [refreshed, setRefreshed] = useState(false)
+    const getJobsData = async () => {
+        try {
+            setRefreshed(true)
+            const res = await getApi({ url: `${process.env.REACT_APP_BASE_URI}/api/job` });
+            if (res.status === 200) {
+                setJobsData(res.data.data);
+                setRefreshed(false)
             }
-        };
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    useEffect(() => {
         getJobsData();
     }, [])
     const columns = [
@@ -107,19 +110,20 @@ function ViewJobs() {
             title: 'status',
             dataIndex: 'status',
             key: 'status',
-            width: 100,
             render: (text, record) => {
                 if (text === 'draft') {
-                    return <Badge count={text} color="#d2b07d" style={{width:'75px'}} />
+                    return <Badge count={text} color="#d2b07d" style={{}} />
                 } else if (text === 'pending') {
-                    return <Badge count={text} color="#e28528" style={{width:'75px'}} />
-                } else if (text === 'in_progress') {
-                    return <Badge count={text} color="blue" style={{width:'75px'}} />
+                    return <Badge count={text} color="#e28528" style={{}} />
+                } else if (text === 'in_progress' || text === 'first_stage_completed' || text === 'second_stage_in_progress') {
+                    return <Badge count={text} color="blue" style={{}} />
                 }else if (text === 'completed') {
-                    return <Badge count={text} color="#00a76f" style={{width:'75px'}} />
+                    return <Badge count={text} color="#00a76f" style={{}} />
+                }else if (text === 'completed') {
+                    return <Badge count={text} color="#00a76f" style={{}} />
                 }
                 else {
-                    return <Badge count={text} color="#ec0606" style={{width:'75px'}}/>
+                    return <Badge count={text} color="#ec0606" style={{}}/>
                 }
             }
         },
@@ -151,6 +155,7 @@ function ViewJobs() {
         },
     ];
     if (jobsData)
+    
         return (
             <>
                 <DashboardHeader />
@@ -160,7 +165,14 @@ function ViewJobs() {
                         <Paragraph style={{ color: 'white' }}>You can change the status of your Sales Officer's accounts, also you can remove them permanently.</Paragraph>
                     </Col>
                 </Row>
+               
                 <Card bordered={false} style={{ width: '95%', margin: '0 auto' }}>
+                <Row>
+                {
+                    refreshed ? <Spin size="large" /> : <button onClick={() => getJobsData()}>Refresh <RedoOutlined /></button>
+                }
+                
+                </Row>
                     <Row className='py-16' justify={'space-between'}>
                         <Col span={24}>
                             <Table dataSource={jobsData} columns={columns} scroll={{ x: 100 }} size='small' />

@@ -10,6 +10,7 @@ import AppRouting from '../AppRouting';
 import TopHeader from './TopHeader';
 import { Link, useNavigate } from 'react-router-dom';
 import Title from 'antd/es/typography/Title';
+import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
 const { Header, Content, Sider } = Layout;
 function getItem(label, key, icon, children) {
   return {
@@ -47,32 +48,34 @@ const MainLayout = () => {
       <span style={{ WebkitMask: `url(${ic_dashboard}) no-repeat center/cover`, width: '30px', height: '30px', backgroundColor: 'currentcolor', color: setThemeColor }}></span>,
     ),
     getItem('Jobs', 'sub', <span style={{ WebkitMask: `url(${ic_job}) no-repeat center/cover`, width: '30px', marginLeft:`${collapsed? '0px': '-5px'}`, height: '30px', backgroundColor: 'currentcolor', color: setThemeColor }}></span>, [
+      
       getItem(
-        <Link to={'/job-by-image'} >Job By Image</Link>,
+        <Link to={'/job-by-image'} >Add - By Image</Link>,
         '2',
-        ''
-      ),
-      getItem(
-        <Link to={'/job-by-demographic'} >Job By Demographic</Link>,
-        '3',
-        ''
-      ),
-      getItem(
-        <Link to={'/job-by-description'} >Job Bu Description</Link>,
-        '4',
-        ''
-      ),
+        <MinusOutlined />
+        ),
+        getItem(
+          <Link to={'/jobs'} >View - All Jobs</Link>,
+          '5',
+          <MinusOutlined />
+        ),
+      // getItem(
+      //   <Link to={'/job-by-demographic'} >Job By Demographic</Link>,
+      //   '3',
+      //   ''
+      // ),
+      // getItem(
+      //   <Link to={'/job-by-description'} >Job Bu Description</Link>,
+      //   '4',
+      //   ''
+      // ),
     ]),
-    getItem(
-      <Link to={'/jobs'} >View Jobs</Link>,
-      '5',
-      <span style={{ WebkitMask: `url(${ic_job}) no-repeat center/cover`, width: '30px', height: '30px', backgroundColor: 'currentcolor', color: setThemeColor }}></span>,
-    ),
-    getItem(
-      <Link to={''} >Profile</Link>,
-      '6',
-      <span style={{ WebkitMask: `url(${ic_user}) no-repeat center/cover`, width: '30px', height: '30px', backgroundColor: 'currentcolor', color: setThemeColor }}></span>,
-    ),
+    
+    // getItem(
+    //   <Link to={''} >Profile</Link>,
+    //   '6',
+    //   <span style={{ WebkitMask: `url(${ic_user}) no-repeat center/cover`, width: '30px', height: '30px', backgroundColor: 'currentcolor', color: setThemeColor }}></span>,
+    // ),
     getItem(
       <Link onClick={() => { localStorage.clear(); navigate('/') }}>Logout</Link>,
       '7',

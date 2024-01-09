@@ -78,7 +78,7 @@ function JobByImages() {
                             }
                         });
                         if (response.status === 201) {
-                            navigate('/')
+                            navigate('/job-detail', {state:{id:response.data.data._id}})
                             enqueueSnackbar(response.data.message, { variant: 'success' });
                         }
                         setLoading(false);

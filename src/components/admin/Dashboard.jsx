@@ -1,19 +1,38 @@
 import './dashboard.css'
 import { Col, Row } from 'antd'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import DashboardHeader from './DashboardHeader'
 import Title from 'antd/es/typography/Title'
 import Paragraph from 'antd/es/typography/Paragraph'
 import JobCard from './JobCard'
 import { Link } from 'react-router-dom'
+import { getApi } from '../../utils/httpServices'
 
 function Dashboard() {
+    const [adsCount, setAdsCount] = useState(0)
+   // create a function to get ads count
+   
     const [statsData] = useState([
-        { title: 'Ads By Image', description: '560 Ads Generated', link: '/job-by-image' , enable : true },
-        { title: 'Ads By Demographic', description: '560 Ads Generated' , link: '/job-by-demographic' ,enable : false},
-        { title: 'Ads By Description', description: '560 Ads Generated' , link: '/job-by-description' ,enable : false},
-        { title: 'Ads By Evaluation', description: '560 Ads Generated' , link: '/job-by-description' ,enable : false},
+        { title: 'Ads By Image', description: `Jobs`, link: '/job-by-image' , enable : true },
+        // { title: 'Ads By Demographic', description: '560 Ads Generated' , link: '/job-by-demographic' ,enable : false},
+        // { title: 'Ads By Description', description: '560 Ads Generated' , link: '/job-by-description' ,enable : false},
+        // { title: 'Ads By Evaluation', description: '560 Ads Generated' , link: '/job-by-description' ,enable : false},
     ])
+
+    const getCount = async () => {
+        try {
+            const res = await getApi({ url: `${process.env.REACT_APP_BASE_URI}/api/job/ran` });
+            if (res.status === 200) {
+                console.log(res.data.data.totalRanJobs);
+                setAdsCount(res.data.data.totalRanJobs);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    useEffect(() => {
+        getCount()
+    }, [])
     return (
         <>
             <DashboardHeader />
@@ -31,7 +50,7 @@ function Dashboard() {
                                 <Col key={item.title} xs={{ span: 24 }} sm={{ span: 12 }} lg={{ span: 12 }} className='pb-8'>
                                     {
                                         item.enable ?  <Link to={item.link}>
-                                        <JobCard description={item.description} title={item.title} />
+                                        <JobCard description={`${adsCount} ${item.description}`} title={item.title} />
                                         </Link> : <JobCard description={item.description} title={item.title} />
 
                                     }
