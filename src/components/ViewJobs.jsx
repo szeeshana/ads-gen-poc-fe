@@ -8,6 +8,7 @@ import DashboardHeader from './admin/DashboardHeader'
 import { enqueueSnackbar } from 'notistack'
 import ReactJson from 'react-json-view'
 import { useNavigate } from 'react-router-dom'
+import { STATUSES } from '../utils/constants'
 
 
 function ViewJobs() {
@@ -35,23 +36,23 @@ function ViewJobs() {
             title: 'Job ID',
             dataIndex: '_id',
             key: 'id',
-            render: (text, record)=>{
-                return(
-                  <>
-                  <Paragraph>{text}
-                  <Tooltip placement="top" title="Copy ID">
-                    <Button type='text' 
-                      onClick={() => {
-                        navigator.clipboard.writeText(text)
-                        enqueueSnackbar("Copied To Clipboard!", {variant: 'success'})
-                        }}>
-                      {<CopyOutlined />}
-                    </Button>
-                  </Tooltip>
-                  </Paragraph>
-                  </>
+            render: (text, record) => {
+                return (
+                    <>
+                        <Paragraph>{text}
+                            <Tooltip placement="top" title="Copy ID">
+                                <Button type='text'
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(text)
+                                        enqueueSnackbar("Copied To Clipboard!", { variant: 'success' })
+                                    }}>
+                                    {<CopyOutlined />}
+                                </Button>
+                            </Tooltip>
+                        </Paragraph>
+                    </>
                 )
-              }
+            }
         },
         {
             title: 'Job Type',
@@ -75,11 +76,11 @@ function ViewJobs() {
             render: (text, record) => {
                 return (
                     <>
-                        <Button onClick={() => setViewDescription(true)} style={{padding:'0px 15px', textAlign:'center'}} >View</Button>
+                        <Button onClick={() => setViewDescription(true)} style={{ padding: '0px 15px', textAlign: 'center' }} >View</Button>
                         <Modal open={viewDescription} title={'Your Data'} footer={null} onCancel={() => setViewDescription(false)}>
                             <Row>
-                                <Col span={24} style={{ minHeight:'200px'}}>
-                                        <ReactJson src={text} collapsed={1} collapseStringsAfterLength={30} theme={'monokai'} indentWidth={3} iconStyle='square' style={{ wordBreak:'break-all'}} />
+                                <Col span={24} style={{ minHeight: '200px' }}>
+                                    <ReactJson src={text} collapsed={1} collapseStringsAfterLength={30} theme={'monokai'} indentWidth={3} iconStyle='square' style={{ wordBreak: 'break-all' }} />
                                 </Col>
                             </Row>
                         </Modal>
@@ -94,7 +95,7 @@ function ViewJobs() {
             render: (text, record) => {
                 return (
                     <>
-                        <Button onClick={() => navigate('/job-detail', {state:{id:record._id}})} style={{padding:'0px 15px', textAlign:'center'}} >View</Button>
+                        <Button onClick={() => navigate('/job-detail', { state: { id: record._id } })} style={{ padding: '0px 15px', textAlign: 'center' }} >View</Button>
                         {/* <Modal open={viewResult} title={'Your Result'} footer={null} onCancel={() => setViewResult(false)}>
                             <Row>
                                 <Col span={24} style={{ minHeight:'200px'}}>
@@ -111,20 +112,7 @@ function ViewJobs() {
             dataIndex: 'status',
             key: 'status',
             render: (text, record) => {
-                if (text === 'draft') {
-                    return <Badge count={text} color="#d2b07d" style={{}} />
-                } else if (text === 'pending') {
-                    return <Badge count={text} color="#e28528" style={{}} />
-                } else if (text === 'in_progress' || text === 'first_stage_completed' || text === 'second_stage_in_progress') {
-                    return <Badge count={text} color="blue" style={{}} />
-                }else if (text === 'completed') {
-                    return <Badge count={text} color="#00a76f" style={{}} />
-                }else if (text === 'completed') {
-                    return <Badge count={text} color="#00a76f" style={{}} />
-                }
-                else {
-                    return <Badge count={text} color="#ec0606" style={{}}/>
-                }
+                return <Badge count={text} color={STATUSES[text]['color']} style={{}} />
             }
         },
         {
@@ -141,7 +129,7 @@ function ViewJobs() {
                                 <EyeOutlined style={{ color: 'green' }} />
                             </Col>
                             <Col span={8} className='w-full action_btn'>
-                            <StopOutlined style={{ color: 'red' }}/>
+                                <StopOutlined style={{ color: 'red' }} />
                                 {/* <DeleteUserModel
                                 onDel={}
                                  id={record.id}
@@ -155,7 +143,7 @@ function ViewJobs() {
         },
     ];
     if (jobsData)
-    
+
         return (
             <>
                 <DashboardHeader />
@@ -165,17 +153,19 @@ function ViewJobs() {
                         <Paragraph style={{ color: 'white' }}>You can change the status of your Sales Officer's accounts, also you can remove them permanently.</Paragraph>
                     </Col>
                 </Row>
-               
+
                 <Card bordered={false} style={{ width: '95%', margin: '0 auto' }}>
-                <Row>
-                {
-                    refreshed ? <Spin size="large" /> : <button onClick={() => getJobsData()}>Refresh <RedoOutlined /></button>
-                }
-                
-                </Row>
+                    <Row>
+
+                    </Row>
                     <Row className='py-16' justify={'space-between'}>
                         <Col span={24}>
                             <Table dataSource={jobsData} columns={columns} scroll={{ x: 100 }} size='small' />
+                        </Col>
+                        <Col span={24 } className='align-items-center flex flex-col' >
+                            {
+                                refreshed ? <Spin size="large" /> : null
+                            }
                         </Col>
                     </Row>
                 </Card>

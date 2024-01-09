@@ -11,6 +11,8 @@ import Paragraph from 'antd/es/typography/Paragraph';
 import { getApi, patchApi, postApi } from '../utils/httpServices';
 import CommonSelect from './common/CommonSelect';
 import { socket } from '../socket';
+import { STATUSES } from '../utils/constants';
+import { io } from 'socket.io-client';
 
 
 function JobDetail() {
@@ -19,77 +21,95 @@ function JobDetail() {
     const [stageData, setStageData] = useState()
     const [jobData, setJobData] = useState([])
     const [viewDescription, setViewDescription] = useState(false)
-    const [count, setCount]= useState(0)
+    const [count, setCount] = useState(0)
     const [isConnected, setIsConnected] = useState(socket.connected)
     const [refreshed, setRefreshed] = useState(false)
-    
+    const [currentStatus, setCurrentStatus] = useState('')
 
-    
-      const getJobData= async()=>{
+    const getJobData = async () => {
         try {
             setRefreshed(true)
 
             const response = await getApi({ url: `${process.env.REACT_APP_BASE_URI}/api/job/${state.id}` });
-            console.log(response);
             if (response.status === 200) {
-                jobData.length >=1? jobData.pop(): console.log('d');
+                jobData.length >= 1 ? jobData.pop() : console.log('d');
                 setJobData([...jobData, response.data.data]);
-                console.log(jobData,"POPO");
+                console.log(jobData, "POPO");
                 setRefreshed(false)
-
+                
             }
         } catch (error) {
             alert('Error: Something went wrong!')
         }
     }
 
+
     useEffect(() => {
         function onConnect() {
-          setIsConnected(true);
+            console.log('connected');
+            setIsConnected(true);
         }
-    
+
         function onDisconnect() {
-          setIsConnected(false);
+            console.log('disconnected');
+            setIsConnected(false);
         }
-    
+
         // function onFooEvent(value) {
         //   setFooEvents(previous => [...previous, value]);
         // }
-        console.log(jobData , ';popopo');
         socket.on('connect', onConnect);
         socket.on('disconnect', onDisconnect);
         // socket.on('foo', onFooEvent);
-        if(jobData && jobData.length) {
-            
-            socket.on(state.id, (value) => {
-                console.log(value, "PPPPPOOIPIO");
-                enqueueSnackbar(value, {variant: 'success'})
+        // if (jobData && jobData.length) {
 
-              });
-              
-        }
-          
+            // socket.on(state.id, (value) => {
+            //     console.log(state.id, 'iidddd');
+            //     console.log(value, "PPPPPOOIPIO");
+            //     enqueueSnackbar(value, { variant: 'success' })
+
+            // });
+
+        // }
+
 
         return () => {
             console.log("PPPREM");
-          socket.off('connect', onConnect);
-          socket.off('disconnect', onDisconnect);
-          if(jobData && jobData.length) {
-            
-              socket.off(jobData[0]['_id']);
+            socket.off('connect', onConnect);
+            socket.off('disconnect', onDisconnect);
+            if (jobData && jobData.length) {
 
-              
-        }
+                socket.off(jobData[0]['_id']);
 
-        //   socket.off('foo', onFooEvent);
+
+            }
+
+            //   socket.off('foo', onFooEvent);
         };
 
 
-      }, []);
+    }, [currentStatus]);
+
+
+    socket.on(state.id, (value) => {
+        console.log(state.id, 'iidddd');
+        console.log(value, "PPPPPOOIPIO");
+        enqueueSnackbar(value, { variant: 'success' })
+
+    });
+
+
+
+
+
+
+
+
+
     useEffect(() => {
-        
-    getJobData()
-    }, count)
+
+        getJobData()
+    }, [count])
 
 
     const handleData = async (stageType) => {
@@ -97,7 +117,7 @@ function JobDetail() {
             const response = await getApi({ url: `${process.env.REACT_APP_BASE_URI}/api/job/${stageType}/${state.id}` });
             if (response.status === 200) {
                 setStageData(response.data.data);
-                if(response.data.data.length === 0) {
+                if (response.data.data.length === 0) {
                     enqueueSnackbar('No Data ', { variant: 'error' })
                 }
             }
@@ -110,23 +130,23 @@ function JobDetail() {
             title: 'Job ID',
             dataIndex: '_id',
             key: 'id',
-            render: (text, record)=>{
-                return(
-                  <>
-                  <Paragraph>{text}
-                  <Tooltip placement="top" title="Copy ID">
-                    <Button type='text' 
-                      onClick={() => {
-                        navigator.clipboard.writeText(text)
-                        enqueueSnackbar("Copied To Clipboard!", {variant: 'success'})
-                        }}>
-                      {<CopyOutlined />}
-                    </Button>
-                  </Tooltip>
-                  </Paragraph>
-                  </>
+            render: (text, record) => {
+                return (
+                    <>
+                        <Paragraph>{text}
+                            <Tooltip placement="top" title="Copy ID">
+                                <Button type='text'
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(text)
+                                        enqueueSnackbar("Copied To Clipboard!", { variant: 'success' })
+                                    }}>
+                                    {<CopyOutlined />}
+                                </Button>
+                            </Tooltip>
+                        </Paragraph>
+                    </>
                 )
-              }
+            }
         },
         {
             title: 'Job Type',
@@ -135,7 +155,7 @@ function JobDetail() {
             render: (text, record) => {
                 if (text === 'image_description_create') {
                     return <Paragraph>By Image</Paragraph>
-                } 
+                }
                 else {
                     return <Paragraph>Job</Paragraph>
                 }
@@ -146,20 +166,20 @@ function JobDetail() {
             dataIndex: 'status',
             key: 'status',
             render: (text, record) => {
-                if (text === 'draft') {
-                    return <Badge count={text} color="#d2b07d" style={{}} />
-                } else if (text === 'pending') {
-                    return <Badge count={text} color="#e28528" style={{}} />
-                } else if (text === 'in_progress' || text === 'first_stage_completed' || text === 'second_stage_in_progress') {
-                    return <Badge count={text} color="blue" style={{}} />
-                }else if (text === 'completed') {
-                    return <Badge count={text} color="#00a76f" style={{}} />
-                }else if (text === 'completed') {
-                    return <Badge count={text} color="#00a76f" style={{}} />
-                }
-                else {
-                    return <Badge count={text} color="#ec0606" style={{}}/>
-                }
+                // if (text === 'draft') {
+                //     return <Badge count={text} color="#d2b07d" style={{}} />
+                // } else if (text === 'pending') {
+                //     return <Badge count={text} color="#e28528" style={{}} />
+                // } else if (text === 'in_progress' || text === 'first_stage_completed' || text === 'second_stage_in_progress') {
+                //     return <Badge count={text} color="blue" style={{}} />
+                // } else if (text === 'completed') {
+                //     return <Badge count={text} color="#00a76f" style={{}} />
+                // } else if (text === 'completed') {
+                //     return <Badge count={text} color="#00a76f" style={{}} />
+                // }
+                // else {
+                return <Badge count={text} color={STATUSES[text]['color']} style={{}} />
+                // }
             }
         },
         {
@@ -169,11 +189,11 @@ function JobDetail() {
             render: (text, record) => {
                 return (
                     <>
-                        <Button onClick={() => setViewDescription(true)} style={{padding:'0px 15px', textAlign:'center'}} >View</Button>
+                        <Button onClick={() => setViewDescription(true)} style={{ padding: '0px 15px', textAlign: 'center' }} >View</Button>
                         <Modal open={viewDescription} title={'Your Data'} footer={null} onCancel={() => setViewDescription(false)}>
                             <Row>
-                                <Col span={24} style={{ minHeight:'200px'}}>
-                                        <ReactJson src={text} collapsed={1} collapseStringsAfterLength={30} theme={'monokai'} indentWidth={3} iconStyle='square' style={{ wordBreak:'break-all'}} />
+                                <Col span={24} style={{ minHeight: '200px' }}>
+                                    <ReactJson src={text} collapsed={1} collapseStringsAfterLength={30} theme={'monokai'} indentWidth={3} iconStyle='square' style={{ wordBreak: 'break-all' }} />
                                 </Col>
                             </Row>
                         </Modal>
@@ -191,25 +211,25 @@ function JobDetail() {
                 return (
                     <>
                         <Row gutter={8} justify={'space-around'} className='w-full'>
-                        <Col span={24}>
-                                <Select 
+                            <Col span={24}>
+                                <Select
                                     placeholder="Change Status"
                                     value={record.status}
-                                    disabled={record.status !== 'draft' && record.status !== 'failed' }
+                                    disabled={record.status !== 'draft' && record.status !== 'failed'}
                                     className='w-full'
                                     options={[
                                         { value: 'draft', label: 'Draft' },
                                         { value: 'pending', label: 'Render Now' },
                                     ]}
-                                    onChange={async(e)=>{
+                                    onChange={async (e) => {
                                         try {
-                                            const response = await patchApi({ 
+                                            const response = await patchApi({
                                                 url: `${process.env.REACT_APP_BASE_URI}/api/job/${state.id}`,
-                                                method:'PATCH',
-                                                body:{status:e},
+                                                method: 'PATCH',
+                                                body: { status: e },
                                             });
                                             if (response.status === 200) {
-                                                setCount(count+1)
+                                                setCount(count + 1)
                                                 enqueueSnackbar('Updated Successfully', { variant: 'success' });
                                             }
                                         } catch (error) {
@@ -225,113 +245,133 @@ function JobDetail() {
         },
     ];
     if (jobData.length)
-    return (
-        <>
-            <DashboardHeader />
-            <Row style={{ marginTop: '-130px' }} className='mx-16'>
-                <Col span={24}>
-                    <Title style={{ color: 'white' }}>All Jobs</Title>
-                    <Paragraph style={{ color: 'white' }}>You can change the status of your Sales Officer's accounts, also you can remove them permanently.</Paragraph>
-                </Col>
-            </Row>
-           
-            <Card bordered={false} style={{ width: '95%', margin: '0 auto' }}>
-            {
-                    refreshed ? <Spin size="large" /> : <button onClick={() => getJobData()}>Refresh <RedoOutlined /></button>
-                }
+        return (
+            <>
+                <DashboardHeader />
+                <Row style={{ marginTop: '-130px' }} className='mx-16'>
+                    <Col span={24}>
+                        <Title style={{ color: 'white' }}>All Jobs</Title>
+                        <Paragraph style={{ color: 'white' }}>You can change the status of your Sales Officer's accounts, also you can remove them permanently.</Paragraph>
+                    </Col>
+                </Row>
+
+                <Card bordered={false} style={{ width: '95%', margin: '0 auto' }}>
+                    {
+                        refreshed ? <Spin size="large" /> : <button onClick={() => getJobData()}>Refresh <RedoOutlined /></button>
+                    }
                     <Row className='pb-16' justify={'space-between'}>
-                    <Col span={24} className='mb-16 pb-16'>
-                        <Table dataSource={jobData} pagination={false} columns={columns} scroll={{ x: 100 }} size='small' />
-                    </Col>
-                    {jobData[0].status !== 'draft' && <> <Col span={24}>
-                        <Collapse size='small' bordered items={
-                            [{
-                                key: '1',
-                                label: <Paragraph>FIRST STAGE DESCRIOTIONS</Paragraph>,
-                                children: jobData && jobData.length && jobData[0]['descriptions'] && jobData[0]['descriptions'].length && jobData[0]['descriptions'].map((item) => <><li><strong>Rating :</strong> {item.rating}</li><li><strong>Description : </strong> <br></br> {item.description}</li> <br></br></>),
-                            }]
-                        } />
-                    </Col>
-                    <Col span={24} className='mt-8'>
-                        <Collapse size='small' bordered items={
-                            [{
-                                key: '1',
-                                label: <Paragraph level={5}>SECOND STAGE DESCRIOTIONS</Paragraph>,
-                                children: jobData && jobData.length && jobData[0]['second_stage_descriptions'] && jobData[0]['second_stage_descriptions'].length && jobData[0]['second_stage_descriptions'].map((item) => <><li><strong>Rating :</strong> {item.rating}</li><li><strong>Description : </strong> <br></br> {item.description}</li> <br></br></>),
-                            }]
-                        } />
-                    </Col></>}
-                </Row>
-                {(jobData[0].status !== 'completed' && jobData[0].status !== 'draft' && jobData[0].status !== 'failed') && <Row>
-                    <Col span={10}></Col>
-                    <Col span={5}><Flex align='center' gap="middle">
-                        <Spin style={{verticalAlign: 'center'}} size="large" />
-                        <h3>JOB IN PROGRESS</h3>
-                        <Spin style={{verticalAlign: 'center'}} size="large" />
-                    </Flex></Col>
-                    {/* <Col span={12}></Col> */}
-                    
-                </Row>}
-
-                {(jobData[0].status === 'completed') && <Row>
-                    <Col span={10}></Col>
-                    <Col span={5}><Flex align='center' gap="middle">
-                        <CheckCircleOutlined style={{color: 'green', fontSize: '40px'}} />
-                        <h3>JOB COMPLTED</h3>
-                        <CheckCircleOutlined style={{color: 'green', fontSize: '40px'}} />
-                    </Flex></Col>
-                    {/* <Col span={12}></Col> */}
-                    
-                </Row>}
-                {
-                    jobData[0].status === 'failed' && <><Row>
-                         <Col span={10}></Col>
-                    <Col span={5}><Flex align='center' gap="middle">
-                        <WarningOutlined style={{color:'red',fontSize: '40px'}} />
-                        <h2>JOB FAILED</h2>
-                        <WarningOutlined style={{color:'red',fontSize: '40px'}} />
-                    </Flex></Col>
+                        <Col span={24} className='mb-16 pb-16'>
+                            <Table dataSource={jobData} pagination={false} columns={columns} scroll={{ x: 100 }} size='small' rowKey="_id"/>
+                        </Col>
+                        {jobData[0].status !== 'draft' && <> <Col span={24}>
+                            <Collapse size='small' bordered items={
+                                [{
+                                    key: '1',
+                                    label: <Paragraph>FIRST STAGE DESCRIOTIONS</Paragraph>,
+                                    children: jobData && jobData.length && jobData[0]['descriptions'] && jobData[0]['descriptions'].length && jobData[0]['descriptions'].map((item) => <><li><strong>Rating :</strong> {item.rating}</li><li><strong>Description : </strong> <br></br> {item.description}</li> <br></br></>),
+                                }]
+                            } />
+                        </Col>
+                            <Col span={24} className='mt-8'>
+                                <Collapse size='small' bordered items={
+                                    [{
+                                        key: '1',
+                                        label: <Paragraph level={5}>SECOND STAGE DESCRIOTIONS</Paragraph>,
+                                        children: jobData && jobData.length && jobData[0]['second_stage_descriptions'] && jobData[0]['second_stage_descriptions'].length && jobData[0]['second_stage_descriptions'].map((item) => <><li><strong>Rating :</strong> {item.rating}</li><li><strong>Description : </strong> <br></br> {item.description}</li> <br></br></>),
+                                    }]
+                                } />
+                            </Col></>}
                     </Row>
-                    <Row>
-                    <Col span={10}></Col>
-               <Col span={5}><Flex align='center' gap="middle">
-                   <p>{jobData[0].failed_reason}</p>
-               </Flex></Col>
-               </Row></>
-                }
-                {jobData[0].status !== 'draft' && 
-                <>
-                    <Row>
-                    <Divider>
-                        <Space size={20}>
-                            <Button type='dashed' onClick={() => handleData(stageType = 'first-stage')} className='px-32 h-10'>Data Stage-1</Button>
-                            <Button type='dashed' onClick={() => handleData(stageType = 'second-stage')} className='px-32 h-10'>Data Stage-2</Button>
-                        </Space>
-                    </Divider>
-                </Row>
-                <Row className='mt-16 mb-16 pt-16'>
-                    <Space className='flex-wrap'>
+                    <Row className='justify-content-center'>
+                        <Col span={12} className='flex flex-col align-items-center text-center'>
+                            {
+                                jobData[0].status === 'in_progress' || jobData[0].status === 'first_stage_completed' || jobData[0].status === 'second_stage_in_progress' ?
+                                    <div className='flex flex-row align-items-center'>
+                                        <Space>
+                                            <Spin style={{ verticalAlign: 'center' }} size="large" />
+                                            <h3>JOB IN PROGRESS</h3>
+                                            <Spin style={{ verticalAlign: 'center' }} size="large" />
+                                        </Space>
+                                    </div> :
+                                    jobData[0].status === 'draft' ? <h3>JOB IN DRAFT <h5>Job is in draft state, you to need to change it to render now</h5></h3> : jobData[0].status === 'completed' ?
+                                        <div className='flex flex-row align-items-center'>
+                                            <Space>
+                                                <CheckCircleOutlined style={{ color: 'green', fontSize: '40px' }} /><h3>JOB COMPLETED</h3><CheckCircleOutlined style={{ color: 'green', fontSize: '40px' }} />
+                                            </Space>
+                                        </div> :
+                                        jobData[0].status === 'pending' ? <h3>JOB PENDING</h3> :
+                                            <div className='flex flex-col align-items-center'>
+                                                <Space><WarningOutlined style={{ color: 'red', fontSize: '40px' }} />
+                                                    <h3>JOB FAILED</h3>
+                                                    <WarningOutlined style={{ color: 'red', fontSize: '40px' }} /></Space>
+                                                <Paragraph className='mt-16'>{jobData[0].failed_reason}</Paragraph>
+                                            </div>
+                            }
+                        </Col>
+                    </Row>
 
-                        {
-                            stageData?.map((img) => (
-                                <Row style={{marginLeft: '10px'}} key={img.image}>
-                                    <Badge count={img.rating}>
-                                        <Image src={img.image} alt={img.image} width={200} height={200} className='border-primary' />
-                                    </Badge>
-                                </Row>
-                            ))
-                        }
-                    </Space>
-                </Row>
-                </>
-                }
-                {
-                    jobData[0].status === 'draft' && <strong>Job is in draft state, you to need to change it to render now</strong>
-                }
-                
-            </Card>
-        </>
-    )
+                    {/* {
+                    (jobData[0].status === 'completed') && <Row>
+                        <Col span={10}></Col>
+                        <Col span={5}><Flex align='center' gap="middle">
+                            <CheckCircleOutlined style={{ color: 'green', fontSize: '40px' }} />
+                            <h3>JOB COMPLTED</h3>
+                            <CheckCircleOutlined style={{ color: 'green', fontSize: '40px' }} />
+                        </Flex></Col>
+
+                    </Row>
+                    } */}
+                    {/* {
+                        jobData[0].status === 'failed' && <><Row>
+                            <Col span={10}></Col>
+                            <Col span={5}><Flex align='center' gap="middle">
+                                <WarningOutlined style={{ color: 'red', fontSize: '40px' }} />
+                                <h2>JOB FAILED</h2>
+                                <WarningOutlined style={{ color: 'red', fontSize: '40px' }} />
+                            </Flex></Col>
+                        </Row>
+                            <Row>
+                                <Col span={10}></Col>
+                                <Col span={5}><Flex align='center' gap="middle">
+                                    <p>{jobData[0].failed_reason}</p>
+                                </Flex></Col>
+                            </Row></>
+                    } */}
+
+                    {jobData[0].status !== 'draft' &&
+                        <>
+                            <Row>
+                                <Divider>
+                                    <Space size={20}>
+                                        <Button type='dashed' onClick={() => handleData(stageType = 'first-stage')} className='px-32 h-10'>Data Stage-1</Button>
+                                        <Button type='dashed' onClick={() => handleData(stageType = 'second-stage')} className='px-32 h-10'>Data Stage-2</Button>
+                                    </Space>
+                                </Divider>
+                            </Row>
+                            <Row className='mt-16 mb-16 pt-16'>
+                                <Space className='flex-wrap'>
+
+                                    {
+                                        stageData?.map((img) => (
+                                            <Row style={{ marginLeft: '10px' }} key={img.image}>
+                                                <Badge count={img.rating}>
+                                                    <Image src={img.image} alt={img.image} width={200} height={200} className='border-primary' />
+                                                </Badge>
+                                            </Row>
+                                        ))
+                                    }
+                                </Space>
+                            </Row>
+                        </>
+                    }
+                    <h1>{currentStatus ? currentStatus : 'xcxcxcx'}</h1>
+                    {/* {
+                        jobData[0].status === 'draft' && <strong>Job is in draft state, you to need to change it to render now</strong>
+                    } */}
+
+                </Card>
+            </>
+        )
 }
 
 export default JobDetail

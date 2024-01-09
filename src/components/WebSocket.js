@@ -5,6 +5,7 @@ function WebSocketComponent() {
     const [message, setMessage] = useState('');
     const [client, setClient] = useState(null);
     const [messageStatus, setMessageStatus] = useState('');
+    const [msgData, setMsgData] = useState('');
 
     useEffect(() => {
         const newClient = new W3CWebSocket('ws://localhost:4000');
@@ -15,6 +16,7 @@ function WebSocketComponent() {
 
         newClient.onmessage = (event) => {
             const receivedMessage = event.data;
+            setMsgData(receivedMessage);
             console.log(`Received message from server: ${receivedMessage}`);
             setMessageStatus('delevered');
             setTimeout(() => {
@@ -34,7 +36,7 @@ function WebSocketComponent() {
                 newClient.close();
             }
         };
-    }, []);
+    }, [messageStatus]);
 
     const sendMessage = (text) => {
         if (client && client.readyState === client.OPEN) {
@@ -57,8 +59,14 @@ function WebSocketComponent() {
             <h1>WebSocket Example</h1>
             <hr />
             <p style={{ fontSize: '20px' }}>Message Status: <b>{messageStatus}</b></p>
+            <br/>
+            <br/>
             <input type="text" value={message} onChange={handleInputChange} />
             <button onClick={handleSendClick}>Send</button>
+            <br/>
+            <br/>
+
+            <h1>{msgData}</h1>
         </div>
     );
 }
