@@ -11,7 +11,7 @@ import Paragraph from 'antd/es/typography/Paragraph';
 import { getApi, patchApi, postApi } from '../utils/httpServices';
 import CommonSelect from './common/CommonSelect';
 import { socket } from '../socket';
-import { STATUSES } from '../utils/constants';
+import { ENQUEUESNACKBAR_MSG_FOR_JOB, STATUSES } from '../utils/constants';
 import { io } from 'socket.io-client';
 
 
@@ -24,12 +24,12 @@ function JobDetail() {
     const [count, setCount] = useState(0)
     const [isConnected, setIsConnected] = useState(socket.connected)
     const [refreshed, setRefreshed] = useState(false)
-    const [currentStatus, setCurrentStatus] = useState('')
 
     const getJobData = async () => {
         try {
+            
             setRefreshed(true)
-
+            
             const response = await getApi({ url: `${process.env.REACT_APP_BASE_URI}/api/job/${state.id}` });
             if (response.status === 200) {
                 jobData.length >= 1 ? jobData.pop() : console.log('d');
@@ -55,59 +55,25 @@ function JobDetail() {
             setIsConnected(false);
         }
 
-        // function onFooEvent(value) {
-        //   setFooEvents(previous => [...previous, value]);
-        // }
         socket.on('connect', onConnect);
         socket.on('disconnect', onDisconnect);
-        // socket.on('foo', onFooEvent);
-        // if (jobData && jobData.length) {
 
-            // socket.on(state.id, (value) => {
-            //     console.log(state.id, 'iidddd');
-            //     console.log(value, "PPPPPOOIPIO");
-            //     enqueueSnackbar(value, { variant: 'success' })
-
-            // });
-
-        // }
-
+        socket.on(state.id, (value) => {
+            console.log(value, "SCOKET CALLED ME");
+            setJobData([value.message.data])
+            enqueueSnackbar(ENQUEUESNACKBAR_MSG_FOR_JOB[value.message.action_type].message, { variant: 'info', autoHideDuration: 2000, anchorOrigin: {vertical: 'top', horizontal: 'center'} })
+        });
 
         return () => {
             console.log("PPPREM");
             socket.off('connect', onConnect);
             socket.off('disconnect', onDisconnect);
-            if (jobData && jobData.length) {
-
-                socket.off(jobData[0]['_id']);
-
-
-            }
-
-            //   socket.off('foo', onFooEvent);
+            socket.off(state.id);
         };
 
-
-    }, [currentStatus]);
-
-
-    socket.on(state.id, (value) => {
-        console.log(state.id, 'iidddd');
-        console.log(value, "PPPPPOOIPIO");
-        enqueueSnackbar(value, { variant: 'success' })
-
-    });
-
-
-
-
-
-
-
-
+    }, []);
 
     useEffect(() => {
-
         getJobData()
     }, [count])
 
@@ -364,10 +330,7 @@ function JobDetail() {
                             </Row>
                         </>
                     }
-                    <h1>{currentStatus ? currentStatus : 'xcxcxcx'}</h1>
-                    {/* {
-                        jobData[0].status === 'draft' && <strong>Job is in draft state, you to need to change it to render now</strong>
-                    } */}
+                    
 
                 </Card>
             </>
