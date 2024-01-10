@@ -26,6 +26,8 @@ function JobDetail() {
     const [refreshed, setRefreshed] = useState(false)
     const [btn1, setBtn1] = useState('')
     const [btn2, setBtn2] = useState('')
+    const [collapse1, setCollapse1] = useState([''])
+    const [collapse2, setCollapse2] = useState([''])
 
     const getJobData = async () => {
         try {
@@ -36,7 +38,6 @@ function JobDetail() {
             if (response.status === 200) {
                 jobData.length >= 1 ? jobData.pop() : console.log('d');
                 setJobData([...jobData, response.data.data]);
-                console.log(jobData, "POPO");
                 setRefreshed(false)
 
             }
@@ -44,7 +45,6 @@ function JobDetail() {
             alert('Error: Something went wrong!')
         }
     }
-
 
     useEffect(() => {
         function onConnect() {
@@ -61,9 +61,25 @@ function JobDetail() {
         socket.on('disconnect', onDisconnect);
 
         socket.on(state.id, (value) => {
-            console.log(value, "SCOKET CALLED ME");
+            console.log(value.message, "SCOKET CALLED ME");
             setJobData([value.message.data])
             enqueueSnackbar(ENQUEUESNACKBAR_MSG_FOR_JOB[value.message.action_type].message, { variant: 'info', autoHideDuration: 2000, anchorOrigin: { vertical: 'top', horizontal: 'center' } })
+            if (value.message.first_stage_description === true) {
+                setCollapse1(['1'])
+            }
+            if (value.message.second_stage_description === true) {
+                setCollapse2(['2'])
+            }
+            if (value.message.first_stage_images === true) {
+                setBtn2({})
+                setBtn1({ color: 'green', borderColor: 'green' })
+                handleData(stageType = 'first-stage')
+            }
+            if (value.message.second_stage_images === true) {
+                setBtn1({})
+                setBtn2({ color: 'green', borderColor: 'green' })
+                handleData(stageType = 'second-stage')
+            }
         });
 
         return () => {
@@ -72,7 +88,7 @@ function JobDetail() {
             socket.off('disconnect', onDisconnect);
             socket.off(state.id);
         };
-    // eslint-disable-next-line
+        // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
@@ -134,7 +150,7 @@ function JobDetail() {
             dataIndex: 'status',
             key: 'status',
             render: (text, record) => {
-                    return <Badge count={STATUSES[text]['text']} color={STATUSES[text]['color']} style={{width: '150px',}} />
+                return <Badge count={STATUSES[text]['text']} color={STATUSES[text]['color']} style={{ width: '150px', }} />
             }
         },
         {
@@ -199,6 +215,7 @@ function JobDetail() {
             }
         },
     ];
+
     if (jobData.length)
         return (
             <>
@@ -213,31 +230,60 @@ function JobDetail() {
                 <Card bordered={false} style={{ width: '95%', margin: '0 auto' }}>
                     <Row className='pb-16' justify={'space-between'}>
                         <Col span={24} className='mb-16 pb-16'>
-                            <Table dataSource={jobData} pagination={false} columns={columns} scroll={{ x: 100 }} size='small' rowKey="_id" />
-                                <div className='flex justify-content-center mt-8' >
-                                    {
-                                        refreshed ? <Spin size="large" /> : <Button icon={<RedoOutlined />} onClick={() => getJobData()}></Button>
-                                    }
-                                </div>
+                            <Table dataSource={jobData} pagination={false} columns={columns} scroll={{ x: 100 }} size='small' key={'_id'} />
+                            <div className='flex justify-content-center mt-8' >
+                                {
+                                    refreshed ? <Spin size="large" /> : <Button icon={<RedoOutlined />} onClick={() => getJobData()}></Button>
+                                }
+                            </div>
                         </Col>
                         {jobData[0].status !== 'draft' && <> <Col span={24}>
-                            <Collapse size='small' bordered items={
-                                [{
-                                    key: '1',
-                                    label: <Paragraph>FIRST STAGE DESCRIOTIONS</Paragraph>,
-                                    children: jobData && jobData.length && jobData[0]['descriptions'] && jobData[0]['descriptions'].length && jobData[0]['descriptions'].map((item) => <><li><strong>Rating :</strong> {item.rating}</li><li><strong>Description : </strong> <br></br> {item.description}</li> <br></br></>),
-                                }]
-                            } />
+                            <Collapse
+                                size='small'
+                                bordered
+                                // key={1}
+                                activeKey={collapse1}
+                                onChange={activeKey => collapse1[0] === '1' ? setCollapse1([]) : setCollapse1(['1'])}
+                                items={
+                                    [
+                                        {
+                                            key: '1',
+                                            label: <Paragraph>FIRST STAGE DESCRIOTIONS</Paragraph>,
+                                            children: jobData && jobData.length && jobData[0]['descriptions'] && jobData[0]['descriptions'].length && jobData[0]['descriptions'].map((item) => <><li><strong>Rating :</strong> {item.rating}</li><li><strong>Description : </strong> <br></br> {item.description}</li> <br></br></>),
+                                        }
+                                    ]
+                                } />
                         </Col>
                             <Col span={24} className='mt-8'>
-                                <Collapse size='small' bordered items={
-                                    [{
-                                        key: '1',
-                                        label: <Paragraph level={5}>SECOND STAGE DESCRIOTIONS</Paragraph>,
-                                        children: jobData && jobData.length && jobData[0]['second_stage_descriptions'] && jobData[0]['second_stage_descriptions'].length && jobData[0]['second_stage_descriptions'].map((item) => <><li><strong>Rating :</strong> {item.rating}</li><li><strong>Description : </strong> <br></br> {item.description}</li> <br></br></>),
-                                    }]
-                                } />
-                            </Col></>}
+                                <Collapse
+                                    size='small'
+                                    bordered
+                                    // key={2}
+                                    activeKey={collapse2}
+                                    onChange={activeKey => collapse2[0] === '2' ? setCollapse2([]) : setCollapse2(['2'])}
+                                    items={
+                                        [{
+                                            key: '2',
+                                            label: <Paragraph level={5}>SECOND STAGE DESCRIOTIONS</Paragraph>,
+                                            children: jobData && jobData.length && jobData[0]['second_stage_descriptions'] && jobData[0]['second_stage_descriptions'].length && jobData[0]['second_stage_descriptions'].map((item) => <><li><strong>Rating :</strong> {item.rating}</li><li><strong>Description : </strong> <br></br> {item.description}</li> <br></br></>),
+                                        }]
+                                    } />
+                            </Col>
+                            {/* <Col span={24}>
+                                <Collapse Collapse activeKey={open} onChange={() => setOpen(prev => [3])}>
+                                    <CollapsePanel
+                                        header="Third Stage Descriptions"
+                                        key={'3'}
+                                        onChange={() => setOpen(prev => [3])}
+                                    >
+                                        <p>sdfsfsdfsfsd</p>
+                                    </CollapsePanel>
+                                        <form onSubmit={handleSubmit}>
+                                            <button type="submit">Submit</button>
+                                        </form>
+                                </Collapse>
+                            </Col> */}
+                        </>}
                     </Row>
                     <Row className='justify-content-center'>
                         <Col span={12} className='flex flex-col align-items-center text-center'>
@@ -271,27 +317,27 @@ function JobDetail() {
                             <Row>
                                 <Divider>
                                     <Space size={20}>
-                                        <Button 
-                                            type='dashed' 
+                                        <Button
+                                            type='dashed'
                                             onClick={() => {
                                                 setBtn2({})
-                                                setBtn1({color:'green', borderColor:'green'})
+                                                setBtn1({ color: 'green', borderColor: 'green' })
                                                 handleData(stageType = 'first-stage')
-                                            }} 
+                                            }}
                                             style={btn1}
                                             className='px-32 h-10'>
-                                                Images Stage-1
+                                            Images Stage-1
                                         </Button>
-                                        <Button 
-                                            type='dashed' 
+                                        <Button
+                                            type='dashed'
                                             onClick={() => {
                                                 setBtn1({})
-                                                setBtn2({color:'green', borderColor:'green'})
+                                                setBtn2({ color: 'green', borderColor: 'green' })
                                                 handleData(stageType = 'second-stage')
-                                            } }
+                                            }}
                                             style={btn2}
                                             className='px-32 h-10'>
-                                                Images Stage-2
+                                            Images Stage-2
                                         </Button>
                                     </Space>
                                 </Divider>
