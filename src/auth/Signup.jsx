@@ -5,14 +5,15 @@ import Title from 'antd/es/typography/Title'
 import { Form, Formik } from 'formik'
 import * as Yup from 'yup'
 import CommonTextInput from '../components/common/CommonTextInput'
-import { CommonCheckbox } from '../components/common/CommonCheckbox'
 import { useNavigate } from 'react-router-dom'
 import { enqueueSnackbar } from 'notistack'
+import ReCAPTCHA from 'react-google-recaptcha'
 import { postApi } from '../utils/httpServices'
 import { Card, Divider } from 'antd/es'
 const { Link, Text } = Typography
 
 function Signup() {
+    const [recaptchaToken, setRecaptchaToken] = useState(null)
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
     return (
@@ -51,6 +52,7 @@ function Signup() {
                                                     method: "POST",
                                                     body: values,
                                                 });
+                                                setRecaptchaToken(null)
                                                 if (response.status === 201) {
                                                     setSubmitting(false)
                                                     navigate('/sign-in')
@@ -60,6 +62,7 @@ function Signup() {
                                             } catch (error) {
                                                 setLoading(false)
                                                 enqueueSnackbar(error.response.data.message, { variant: 'error' });
+                                                setRecaptchaToken(null)
                                             }
                                         }}
                                     >
@@ -100,22 +103,13 @@ function Signup() {
                                                 placeholder="********"
                                                 size="large"
                                             />
-                                            <div className="flex flex-row justify-content-between">
-                                                <div >
-                                                    <CommonCheckbox
-                                                        label='Remember me ?'
-                                                        name="remember"
-                                                        id="remember"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <Link href="http://localhost:3000/signin" target="_blank">
-                                                        Forget password?
-                                                    </Link>
-                                                </div>
-                                            </div>
+
+                                            <ReCAPTCHA
+                                                sitekey='6LckVEwpAAAAAD5bRAGI12uIUdJ5JRG9pvmGaGkR'
+                                                onChange={(value) => {setRecaptchaToken(value)}}
+                                            />
                                             <br />
-                                            <Button type='primary' disabled={loading} htmlType='submit' className='px-32'>{loading ? <Spin/> : 'Submit'}</Button>
+                                            <Button type='primary' disabled={!recaptchaToken? true: false} htmlType='submit' className='px-32'>{loading ? <Spin/> : 'Submit'}</Button>
                                             <br />
                                             <br />
                                             <Text italic>Already have an account </Text>

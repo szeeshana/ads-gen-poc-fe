@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import DashboardHeader from './admin/DashboardHeader';
-import { Button, Card, Col, Collapse, Divider, Image, Row, Space, Table, Badge, Modal, Tooltip, Select, Flex, Spin } from 'antd';
-import { EyeOutlined, StopOutlined, CopyOutlined, RedoOutlined, WarningOutlined, CheckCircleOutlined } from '@ant-design/icons'
+import { Button, Card, Col, Collapse, Divider, Image, Row, Space, Table, Badge, Modal, Tooltip, Select, Spin } from 'antd';
+import { CopyOutlined, RedoOutlined, WarningOutlined, CheckCircleOutlined } from '@ant-design/icons'
 import { enqueueSnackbar } from 'notistack'
 import ReactJson from 'react-json-view'
 
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
-import { getApi, patchApi, postApi } from '../utils/httpServices';
-import CommonSelect from './common/CommonSelect';
+import { getApi, patchApi } from '../utils/httpServices';
+// import CommonSelect from './common/CommonSelect';
 import { socket } from '../socket';
 import { ENQUEUESNACKBAR_MSG_FOR_JOB, STATUSES } from '../utils/constants';
-import { io } from 'socket.io-client';
 
 
 function JobDetail() {
@@ -22,21 +21,24 @@ function JobDetail() {
     const [jobData, setJobData] = useState([])
     const [viewDescription, setViewDescription] = useState(false)
     const [count, setCount] = useState(0)
+    // eslint-disable-next-line
     const [isConnected, setIsConnected] = useState(socket.connected)
     const [refreshed, setRefreshed] = useState(false)
+    const [btn1, setBtn1] = useState('')
+    const [btn2, setBtn2] = useState('')
 
     const getJobData = async () => {
         try {
-            
+
             setRefreshed(true)
-            
+
             const response = await getApi({ url: `${process.env.REACT_APP_BASE_URI}/api/job/${state.id}` });
             if (response.status === 200) {
                 jobData.length >= 1 ? jobData.pop() : console.log('d');
                 setJobData([...jobData, response.data.data]);
                 console.log(jobData, "POPO");
                 setRefreshed(false)
-                
+
             }
         } catch (error) {
             alert('Error: Something went wrong!')
@@ -61,7 +63,7 @@ function JobDetail() {
         socket.on(state.id, (value) => {
             console.log(value, "SCOKET CALLED ME");
             setJobData([value.message.data])
-            enqueueSnackbar(ENQUEUESNACKBAR_MSG_FOR_JOB[value.message.action_type].message, { variant: 'info', autoHideDuration: 2000, anchorOrigin: {vertical: 'top', horizontal: 'center'} })
+            enqueueSnackbar(ENQUEUESNACKBAR_MSG_FOR_JOB[value.message.action_type].message, { variant: 'info', autoHideDuration: 2000, anchorOrigin: { vertical: 'top', horizontal: 'center' } })
         });
 
         return () => {
@@ -70,7 +72,7 @@ function JobDetail() {
             socket.off('disconnect', onDisconnect);
             socket.off(state.id);
         };
-
+    // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
@@ -132,20 +134,7 @@ function JobDetail() {
             dataIndex: 'status',
             key: 'status',
             render: (text, record) => {
-                // if (text === 'draft') {
-                //     return <Badge count={text} color="#d2b07d" style={{}} />
-                // } else if (text === 'pending') {
-                //     return <Badge count={text} color="#e28528" style={{}} />
-                // } else if (text === 'in_progress' || text === 'first_stage_completed' || text === 'second_stage_in_progress') {
-                //     return <Badge count={text} color="blue" style={{}} />
-                // } else if (text === 'completed') {
-                //     return <Badge count={text} color="#00a76f" style={{}} />
-                // } else if (text === 'completed') {
-                //     return <Badge count={text} color="#00a76f" style={{}} />
-                // }
-                // else {
-                return <Badge count={text} color={STATUSES[text]['color']} style={{}} />
-                // }
+                    return <Badge count={STATUSES[text]['text']} color={STATUSES[text]['color']} style={{width: '150px',}} />
             }
         },
         {
@@ -222,12 +211,14 @@ function JobDetail() {
                 </Row>
 
                 <Card bordered={false} style={{ width: '95%', margin: '0 auto' }}>
-                    {
-                        refreshed ? <Spin size="large" /> : <button onClick={() => getJobData()}>Refresh <RedoOutlined /></button>
-                    }
                     <Row className='pb-16' justify={'space-between'}>
                         <Col span={24} className='mb-16 pb-16'>
-                            <Table dataSource={jobData} pagination={false} columns={columns} scroll={{ x: 100 }} size='small' rowKey="_id"/>
+                            <Table dataSource={jobData} pagination={false} columns={columns} scroll={{ x: 100 }} size='small' rowKey="_id" />
+                                <div className='flex justify-content-center mt-8' >
+                                    {
+                                        refreshed ? <Spin size="large" /> : <Button icon={<RedoOutlined />} onClick={() => getJobData()}></Button>
+                                    }
+                                </div>
                         </Col>
                         {jobData[0].status !== 'draft' && <> <Col span={24}>
                             <Collapse size='small' bordered items={
@@ -275,48 +266,38 @@ function JobDetail() {
                             }
                         </Col>
                     </Row>
-
-                    {/* {
-                    (jobData[0].status === 'completed') && <Row>
-                        <Col span={10}></Col>
-                        <Col span={5}><Flex align='center' gap="middle">
-                            <CheckCircleOutlined style={{ color: 'green', fontSize: '40px' }} />
-                            <h3>JOB COMPLTED</h3>
-                            <CheckCircleOutlined style={{ color: 'green', fontSize: '40px' }} />
-                        </Flex></Col>
-
-                    </Row>
-                    } */}
-                    {/* {
-                        jobData[0].status === 'failed' && <><Row>
-                            <Col span={10}></Col>
-                            <Col span={5}><Flex align='center' gap="middle">
-                                <WarningOutlined style={{ color: 'red', fontSize: '40px' }} />
-                                <h2>JOB FAILED</h2>
-                                <WarningOutlined style={{ color: 'red', fontSize: '40px' }} />
-                            </Flex></Col>
-                        </Row>
-                            <Row>
-                                <Col span={10}></Col>
-                                <Col span={5}><Flex align='center' gap="middle">
-                                    <p>{jobData[0].failed_reason}</p>
-                                </Flex></Col>
-                            </Row></>
-                    } */}
-
                     {jobData[0].status !== 'draft' &&
                         <>
                             <Row>
                                 <Divider>
                                     <Space size={20}>
-                                        <Button type='dashed' onClick={() => handleData(stageType = 'first-stage')} className='px-32 h-10'>Data Stage-1</Button>
-                                        <Button type='dashed' onClick={() => handleData(stageType = 'second-stage')} className='px-32 h-10'>Data Stage-2</Button>
+                                        <Button 
+                                            type='dashed' 
+                                            onClick={() => {
+                                                setBtn2({})
+                                                setBtn1({color:'green', borderColor:'green'})
+                                                handleData(stageType = 'first-stage')
+                                            }} 
+                                            style={btn1}
+                                            className='px-32 h-10'>
+                                                Images Stage-1
+                                        </Button>
+                                        <Button 
+                                            type='dashed' 
+                                            onClick={() => {
+                                                setBtn1({})
+                                                setBtn2({color:'green', borderColor:'green'})
+                                                handleData(stageType = 'second-stage')
+                                            } }
+                                            style={btn2}
+                                            className='px-32 h-10'>
+                                                Images Stage-2
+                                        </Button>
                                     </Space>
                                 </Divider>
                             </Row>
                             <Row className='mt-16 mb-16 pt-16'>
                                 <Space className='flex-wrap'>
-
                                     {
                                         stageData?.map((img) => (
                                             <Row style={{ marginLeft: '10px' }} key={img.image}>
@@ -330,8 +311,6 @@ function JobDetail() {
                             </Row>
                         </>
                     }
-                    
-
                 </Card>
             </>
         )

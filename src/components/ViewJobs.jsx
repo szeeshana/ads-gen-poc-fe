@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Badge, Button, Card, Col, Modal, Row, Spin, Table, Tooltip } from 'antd'
-import { EyeOutlined, StopOutlined, CopyOutlined, RedoOutlined } from '@ant-design/icons'
+import { EyeOutlined, CopyOutlined, } from '@ant-design/icons'
 import Title from 'antd/es/typography/Title'
 import Paragraph from 'antd/es/typography/Paragraph'
 import { getApi } from '../utils/httpServices'
@@ -9,6 +9,7 @@ import { enqueueSnackbar } from 'notistack'
 import ReactJson from 'react-json-view'
 import { useNavigate } from 'react-router-dom'
 import { STATUSES } from '../utils/constants'
+import { stringContinuety, timeStamp } from '../utils/helper'
 
 
 function ViewJobs() {
@@ -21,7 +22,11 @@ function ViewJobs() {
             setRefreshed(true)
             const res = await getApi({ url: `${process.env.REACT_APP_BASE_URI}/api/job` });
             if (res.status === 200) {
+                for (let i = 0; i < res.data.data.length; i++) {
+                    res.data.data[i].key = i+1
+                }
                 setJobsData(res.data.data);
+                console.log(jobsData, "POPO");
                 setRefreshed(false)
             }
         } catch (error) {
@@ -30,8 +35,15 @@ function ViewJobs() {
     };
     useEffect(() => {
         getJobsData();
+        // eslint-disable-next-line
     }, [])
+
     const columns = [
+        {
+            title: 'S#',
+            dataIndex: 'key',
+            sorter: (a, b) => a.key - b.key,
+        },
         {
             title: 'Job ID',
             dataIndex: '_id',
@@ -39,7 +51,7 @@ function ViewJobs() {
             render: (text, record) => {
                 return (
                     <>
-                        <Paragraph>{text}
+                        <Paragraph>{stringContinuety(text, 0, 10)}
                             <Tooltip placement="top" title="Copy ID">
                                 <Button type='text'
                                     onClick={() => {
@@ -58,6 +70,7 @@ function ViewJobs() {
             title: 'Job Type',
             dataIndex: 'type',
             key: 'type',
+            sorter: (a, b) => a.type.localeCompare(b.type),
             render: (text, record) => {
                 if (text === 'description_create') {
                     return <Paragraph>Description Only</Paragraph>
@@ -68,6 +81,15 @@ function ViewJobs() {
                     return <Paragraph>Evaluation</Paragraph>
                 }
             }
+        },
+        {
+            title: 'Date',
+            dataIndex: 'createdAt',
+            key: 'data',
+            render: (record) => {
+                return timeStamp(record)
+            },
+            sorter: (a, b) => a.createdAt.localeCompare(b.createdAt),
         },
         {
             title: 'Data',
@@ -89,53 +111,35 @@ function ViewJobs() {
             }
         },
         {
-            title: 'Result',
-            dataIndex: 'result',
-            key: 'result',
-            render: (text, record) => {
-                return (
-                    <>
-                        <Button onClick={() => navigate('/job-detail', { state: { id: record._id } })} style={{ padding: '0px 15px', textAlign: 'center' }} >View</Button>
-                        {/* <Modal open={viewResult} title={'Your Result'} footer={null} onCancel={() => setViewResult(false)}>
-                            <Row>
-                                <Col span={24} style={{ minHeight:'200px'}}>
-                                        <ReactJson src={text} collapsed={1} collapseStringsAfterLength={30} theme={'monokai'} indentWidth={3} iconStyle='square' style={{ wordBreak:'break-all'}} />
-                                </Col>
-                            </Row>
-                        </Modal> */}
-                    </>
-                )
-            }
-        },
-        {
             title: 'status',
             dataIndex: 'status',
             key: 'status',
+            sorter: (a, b) => a.status.localeCompare(b.status),
             render: (text, record) => {
-                return <Badge count={text} color={STATUSES[text]['color']} style={{}} />
+                return <Badge count={STATUSES[text]['text']} color={STATUSES[text]['color']} style={{width: '150px',}} />
             }
         },
         {
             title: 'Action',
             key: 'action',
             dataIndex: 'action',
-            width: 100,
+            width: 70,
 
             render: (text, record) => {
                 return (
                     <>
                         <Row gutter={8} justify={'space-around'} className='w-full'>
-                            <Col span={8} className='w-full action_btn'>
+                            <Col span={12} className='w-full action_btn' onClick={() => navigate('/job-detail', { state: { id: record._id } })}>
                                 <EyeOutlined style={{ color: 'green' }} />
                             </Col>
-                            <Col span={8} className='w-full action_btn'>
-                                <StopOutlined style={{ color: 'red' }} />
+                            {/* <Col span={8} className='w-full action_btn'>
+                                <StopOutlined style={{ color: 'red' }} /> */}
                                 {/* <DeleteUserModel
                                 onDel={}
                                  id={record.id}
                                  />
                                 <DeleteOutlined style={{ color: 'red' }} /> */}
-                            </Col>
+                            {/* </Col> */}
                         </Row>
                     </>
                 )
@@ -160,9 +164,19 @@ function ViewJobs() {
                     </Row>
                     <Row className='py-16' justify={'space-between'}>
                         <Col span={24}>
-                            <Table dataSource={jobsData} columns={columns} scroll={{ x: 100 }} size='small' />
+                            <Table
+                                dataSource={jobsData}
+                                columns={columns}
+                                scroll={{ x: 100 }}
+                                size='small'
+                                // pagination={{
+                                //     onChange(current, pageSize) {
+                                //         setPage(current);
+                                //     }
+                                // }}
+                            />
                         </Col>
-                        <Col span={24 } className='align-items-center flex flex-col' >
+                        <Col span={24} className='align-items-center flex flex-col' >
                             {
                                 refreshed ? <Spin size="large" /> : null
                             }

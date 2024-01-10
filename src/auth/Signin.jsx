@@ -5,17 +5,19 @@ import Title from 'antd/es/typography/Title'
 import { Form, Formik } from 'formik'
 import * as Yup from 'yup'
 import CommonTextInput from '../components/common/CommonTextInput'
-import { CommonCheckbox } from '../components/common/CommonCheckbox'
 import { useNavigate } from 'react-router-dom'
 import { enqueueSnackbar } from 'notistack'
 import { postApi } from '../utils/httpServices'
 import { Card, Divider } from 'antd/es'
 import GoogleSignin from './firebase/GoogleSignin'
+import ReCAPTCHA from 'react-google-recaptcha'
 const { Link, Text } = Typography
 
 function Signin() {
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
+    const [recaptchaToken, setRecaptchaToken] = useState(null)
+
     return (
         <>
             <Row className='min-h-screen card-gradient'>
@@ -46,6 +48,7 @@ function Signin() {
                                                     method: "POST",
                                                     body: values,
                                                 });
+                                                setRecaptchaToken(null)
                                                 if (response.status === 200) {
                                                     localStorage.setItem('token', response.data.access_token)
                                                     setSubmitting(false)
@@ -55,6 +58,7 @@ function Signin() {
                                                 setLoading(false);
                                             } catch (error) {
                                                 setLoading(false)
+                                                setRecaptchaToken(null)
                                                 enqueueSnackbar(error.response.data.message, { variant: 'error' });
                                             }
                                         }}
@@ -80,11 +84,6 @@ function Signin() {
                                             />
                                             <div className="flex flex-row justify-content-between">
                                                 <div >
-                                                    <CommonCheckbox
-                                                        label='Remember me ?'
-                                                        name="remember"
-                                                        id="remember"
-                                                    />
                                                 </div>
                                                 <div>
                                                     <Link href="http://localhost:3000/signin" target="_blank">
@@ -92,8 +91,12 @@ function Signin() {
                                                     </Link>
                                                 </div>
                                             </div>
+                                            <ReCAPTCHA
+                                                sitekey='6LckVEwpAAAAAD5bRAGI12uIUdJ5JRG9pvmGaGkR'
+                                                onChange={(value) => {setRecaptchaToken(value)}}
+                                            />
                                             <br />
-                                            <Button type='primary' disabled={loading} htmlType='submit' className='px-32'>{loading ? <Spin /> : 'Submit'}</Button>
+                                            <Button type='primary' disabled={!recaptchaToken? true: false} htmlType='submit' className='px-32'>{loading ? <Spin /> : 'Submit'}</Button>
                                             <br />
                                             <br />
                                             <Text italic>Don't have an account </Text>

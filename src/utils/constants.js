@@ -1,24 +1,31 @@
 export const STATUSES = {
     draft :{
-        color: '#d2b07d'
+        color: '#d2b07d',
+        text: 'Draft'
     },
     pending :{
-        color: '#e28528'
+        color: '#e28528',
+        text: 'Pending'
     }, 
     in_progress :{
-        color: 'blue'
+        color: 'blue',
+        text: 'In Progress'
     }, 
     first_stage_completed :{
-        color: 'blue'
+        color: 'blue',
+        text: 'First Stage Completed'
     }, 
     second_stage_in_progress :{
-        color: 'blue'
+        color: 'blue',
+        text: 'Second Stage In Progress'
     }, 
     completed :{
-        color: '#00a76f'
+        color: '#00a76f',
+        text: 'Completed'
     },
     failed :{
-        color: '#ec0606'
+        color: '#ec0606',
+        text: 'Failed'
     }
 
 }
