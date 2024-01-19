@@ -1,8 +1,8 @@
 import React from 'react'
 import { auth } from "./FirebaseConfig";
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { Button, Row, Space } from 'antd';
-import {FacebookOutlined, GoogleOutlined, AppleOutlined} from '@ant-design/icons'
+import { Row, Space } from 'antd';
+import { FacebookLoginButton, GoogleLoginButton } from 'react-social-login-buttons';
 
 function GoogleSignin() {
     const handleGoogleSignIn = async () => {
@@ -17,9 +17,8 @@ function GoogleSignin() {
     return (
         <Row>
             <Space>
-            <Button icon={<GoogleOutlined />} onClick={handleGoogleSignIn}>Google Sign-in</Button>
-            <Button icon={<AppleOutlined />} onClick={handleGoogleSignIn}>Apple Sign-in</Button>
-            <Button icon={<FacebookOutlined size="large" />} onClick={handleGoogleSignIn}>Facebook Sign-in</Button>
+            <GoogleLoginButton  onClick={handleGoogleSignIn} size='35px' style={{ fontSize:'16px' }} />
+            <FacebookLoginButton onClick={() => alert("Hello")} size='35px' style={{ fontSize:'16px' }} />
             </Space>
         </Row>
     )

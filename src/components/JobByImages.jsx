@@ -9,6 +9,8 @@ import { enqueueSnackbar } from 'notistack';
 import { postApi } from '../utils/httpServices';
 import { useNavigate } from 'react-router-dom';
 import CommonSelect from './common/CommonSelect';
+import { CommonTextAreaInput } from './common/CommonTextArea';
+import CommonInfoMsg from './common/CommonInfoMsg';
 const getBase64 = (file) =>
     new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -47,6 +49,8 @@ function JobByImages() {
             </div>
         </div>
     );
+    const productDescription = `We are a marketing agency creating advertisements for a client.The product is Auto financing for people with bad credit.`;
+    const productDemographic = `The target demographic for the product is males aged 25-34 with below average income and credit score.`
     return (
         <div>
             <DashboardHeader />
@@ -57,9 +61,12 @@ function JobByImages() {
                 </Col>
             </Row>
             <Formik
+                enableReinitialize={true}
                 initialValues={{
                     image: '',
-                    status:''
+                    status:'',
+                    product_description:productDescription? productDescription: '',
+                    demographic:productDemographic? productDemographic: '',
                 }}
                 onSubmit={async (values, { setSubmitting }) => {
                     setLoading(true);
@@ -91,7 +98,7 @@ function JobByImages() {
                 {({ setFieldValue }) => (
                     <Form>
                         <Row className='mx-8' style={{ marginTop: '60px' }}>
-                        <Col span={24}>
+                        <Col span={24} className='mt-8'>
                                 <CommonSelect
                                     label="What you want to do with this job?"
                                     name="status"
@@ -105,6 +112,32 @@ function JobByImages() {
                                         { value: 'pending', label: 'Render Now' },
                                     ]}
                                     onChange={(e) => setFieldValue('status', e)}
+                                />
+                            </Col>
+                            <Col span={24} className='mt-16'>
+                                <CommonInfoMsg title="Product Description" content="Describe the product" />
+                            </Col>
+                            <Col span={24}>
+                                <CommonTextAreaInput
+                                    name="product_description"
+                                    id="product_description"
+                                    className='w-full mt-4'
+                                    type='text'
+                                    size='large'
+                                    style={{ minHeight: '100px' }}
+                                />
+                            </Col>
+                            <Col span={24} className='mt-16'>
+                                <CommonInfoMsg title="Product Demographics" content="product demographics" />
+                            </Col>
+                            <Col span={24}>
+                                <CommonTextAreaInput
+                                    name="demographic"
+                                    id="demographic"
+                                    className='w-full mt-4'
+                                    type='text'
+                                    size='large'
+                                    style={{ minHeight: '100px' }}
                                 />
                             </Col>
                             <Col span={24} className='w-full mb-8 mt-16'>
