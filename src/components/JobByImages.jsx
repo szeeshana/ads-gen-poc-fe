@@ -115,7 +115,7 @@ function JobByImages() {
                                 />
                             </Col>
                             <Col span={24} className='mt-16'>
-                                <CommonInfoMsg title="Product Description" content="Describe the product" />
+                                <CommonInfoMsg title="Product Description" content="We are a marketing agency creating advertisements for a client. The product is Auto financing for people with bad credit." />
                             </Col>
                             <Col span={24}>
                                 <CommonTextAreaInput
@@ -128,7 +128,7 @@ function JobByImages() {
                                 />
                             </Col>
                             <Col span={24} className='mt-16'>
-                                <CommonInfoMsg title="Product Demographics" content="product demographics" />
+                                <CommonInfoMsg title="Product Demographics" content="The target demographic for the product is males aged 25-34 with below average income and credit score." />
                             </Col>
                             <Col span={24}>
                                 <CommonTextAreaInput

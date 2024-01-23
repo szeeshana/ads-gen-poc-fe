@@ -9,7 +9,6 @@ import ReactJson from 'react-json-view'
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { getApi, patchApi } from '../utils/httpServices';
-// import CommonSelect from './common/CommonSelect';
 import { socket } from '../socket';
 import { ENQUEUESNACKBAR_MSG_FOR_JOB, STATUSES } from '../utils/constants';
 
@@ -269,20 +268,6 @@ function JobDetail() {
                                         }]
                                     } />
                             </Col>
-                            {/* <Col span={24}>
-                                <Collapse Collapse activeKey={open} onChange={() => setOpen(prev => [3])}>
-                                    <CollapsePanel
-                                        header="Third Stage Descriptions"
-                                        key={'3'}
-                                        onChange={() => setOpen(prev => [3])}
-                                    >
-                                        <p>sdfsfsdfsfsd</p>
-                                    </CollapsePanel>
-                                        <form onSubmit={handleSubmit}>
-                                            <button type="submit">Submit</button>
-                                        </form>
-                                </Collapse>
-                            </Col> */}
                         </>}
                     </Row>
                     <Row className='justify-content-center'>
